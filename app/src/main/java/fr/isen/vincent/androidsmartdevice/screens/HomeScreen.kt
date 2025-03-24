@@ -17,9 +17,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,14 +24,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import fr.isen.vincent.androidsmartdevice.activities.ScanActivity
 import fr.isen.vincent.androidsmartdevice.components.TopBar
-import fr.isen.vincent.androidsmartdevice.utils.AppUtil
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
 
     val context = LocalContext.current
-
-    val case by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -78,14 +72,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
             Button(
                 onClick = {
-                    when (case) {
-                        0 -> {
-                            val intent = Intent(context, ScanActivity::class.java)
-                            context.startActivity(intent)
-                        }
-                        1 -> AppUtil.showToast(context, "Bluetooth non dispo")
-                        2 -> AppUtil.showToast(context, "Bluetooth non activé")
-                    }
+                    val intent = Intent(context, ScanActivity::class.java)
+                    context.startActivity(intent)
                 },
                 modifier = Modifier
                     .fillMaxWidth()

@@ -1,5 +1,6 @@
 package fr.isen.vincent.androidsmartdevice.screens
 
+import android.bluetooth.BluetoothAdapter
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,17 +31,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fr.isen.vincent.androidsmartdevice.components.TopBar
 import fr.isen.vincent.androidsmartdevice.models.DeviceModel
+import fr.isen.vincent.androidsmartdevice.utils.AppUtil
 
 @Composable
 fun ScanScreen(modifier : Modifier = Modifier) {
 
+    val context = LocalContext.current
+
     var isLoading by remember { mutableStateOf(false) }
+
+    val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
 
     Column(
         modifier = Modifier
@@ -60,7 +66,14 @@ fun ScanScreen(modifier : Modifier = Modifier) {
 
             Button(
                 onClick = {
-                    isLoading = !isLoading
+                    when {
+                        bluetoothAdapter == null -> AppUtil.showToast(context, "Bluetooth non disponible")
+                        !bluetoothAdapter.isEnabled -> AppUtil.showToast(context, "Bluetooth non activé")
+                        else -> {
+                            isLoading = !isLoading
+                            //On lance le scan
+                        }
+                    }
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
