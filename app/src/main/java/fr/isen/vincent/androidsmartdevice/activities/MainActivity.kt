@@ -1,4 +1,4 @@
-package fr.isen.vincent.androidsmartdevice
+package fr.isen.vincent.androidsmartdevice.activities
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -17,7 +17,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AndroidSmartDeviceTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(
+                    modifier = Modifier.fillMaxSize()
+                ) { innerPadding ->
                     HomeScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
