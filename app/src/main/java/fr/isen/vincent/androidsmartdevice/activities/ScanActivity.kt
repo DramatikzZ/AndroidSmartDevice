@@ -25,8 +25,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import fr.isen.vincent.androidsmartdevice.models.DeviceModel
 import fr.isen.vincent.androidsmartdevice.utils.AppUtil
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class ScanActivity : ComponentActivity() {
 
@@ -39,6 +43,9 @@ class ScanActivity : ComponentActivity() {
     }
 
     private val devices = mutableStateListOf<DeviceModel>()
+
+    private var scanTimeoutJob: Job? = null
+
 
     private val scanCallback = object : ScanCallback() {
         @SuppressLint("MissingPermission")
@@ -115,22 +122,35 @@ class ScanActivity : ComponentActivity() {
     @SuppressLint("MissingPermission")
     private fun toggleScan() {
         if (isLoading) {
-            Log.d("BLE_SCAN", "Arrêt du scan")
+            Log.d("BLE_SCAN", "Arrêt manuel du scan")
             bluetoothLeScanner.stopScan(scanCallback)
+            scanTimeoutJob?.cancel()
         } else {
             Log.d("BLE_SCAN", "Démarrage du scan BLE")
             devices.clear()
             bluetoothLeScanner.startScan(scanCallback)
+
+            // Lancer le timeout automatique (10 secondes)
+            scanTimeoutJob = lifecycleScope.launch {
+                delay(10_000) // 10 secondes
+                Log.d("BLE_SCAN", "Timeout atteint : arrêt du scan automatique")
+                bluetoothLeScanner.stopScan(scanCallback)
+                isLoading = false
+            }
         }
+
         isLoading = !isLoading
     }
+
 
     @SuppressLint("MissingPermission")
     override fun onStop() {
         super.onStop()
         bluetoothLeScanner.stopScan(scanCallback)
+        scanTimeoutJob?.cancel()
         isLoading = false
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
