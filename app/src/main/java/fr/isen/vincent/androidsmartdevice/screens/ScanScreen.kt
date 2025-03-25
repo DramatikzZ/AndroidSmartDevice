@@ -24,10 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,54 +36,46 @@ import fr.isen.vincent.androidsmartdevice.models.DeviceModel
 import fr.isen.vincent.androidsmartdevice.utils.AppUtil
 
 @Composable
-fun ScanScreen(modifier : Modifier = Modifier) {
-
+fun ScanScreen(
+    modifier: Modifier,
+    devices: List<DeviceModel>,
+    isLoading: Boolean,
+    onScanToggle: () -> Unit
+) {
     val context = LocalContext.current
 
-    var isLoading by remember { mutableStateOf(false) }
-
-    val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-
+    Column(modifier = modifier.fillMaxSize()) {
         TopBar(modifier)
 
-        Column (
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Spacer(Modifier.height(20.dp))
 
             Button(
                 onClick = {
+                    val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
                     when {
-                        bluetoothAdapter == null -> AppUtil.showToast(context, "Bluetooth non disponible")
-                        !bluetoothAdapter.isEnabled -> AppUtil.showToast(context, "Bluetooth non activé")
-                        else -> {
-                            isLoading = !isLoading
-                            //On lance le scan
-                        }
+                        bluetoothAdapter == null ->
+                            AppUtil.showToast(context, "Bluetooth non disponible")
+                        !bluetoothAdapter.isEnabled ->
+                            AppUtil.showToast(context, "Bluetooth non activé")
+                        else -> onScanToggle()
                     }
-                },
-                modifier = Modifier.fillMaxWidth()
+                }
             ) {
-                Row (
+                Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
-                ){
+                ) {
                     Text(
                         text = if (!isLoading) "Lancer le scan BLE" else "Scan BLE en cours...",
                         fontSize = 22.sp
                     )
-
-                    Spacer(modifier.width(20.dp))
-
+                    Spacer(Modifier.width(20.dp))
                     Icon(
                         imageVector = if (!isLoading) Icons.Default.PlayArrow else Icons.Default.Pause,
                         contentDescription = "Icone",
@@ -98,16 +86,9 @@ fun ScanScreen(modifier : Modifier = Modifier) {
 
             Spacer(Modifier.height(20.dp))
 
-            val devices = remember {
-                listOf(
-                    DeviceModel(signal = -45, name = "SmartWatch", macaddress = "00:11:22:33:44:55"),
-                    DeviceModel(signal = -60, name = "Casque Audio", macaddress = "AA:BB:CC:DD:EE:FF")
-                )
-            }
-
             LazyColumn {
                 items(devices.size) { index ->
-                    if(index!=0){
+                    if (index != 0) {
                         HorizontalDivider(modifier = Modifier.padding(8.dp))
                     }
                     DeviceItem(devices[index])
@@ -125,12 +106,12 @@ fun DeviceItem(device: DeviceModel) {
         Box(
             modifier = Modifier
                 .padding(4.dp)
-                .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.dp)),
+                .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.dp))
         ) {
             Text(
                 text = "${device.signal}",
                 style = MaterialTheme.typography.titleLarge,
-                color = Color.White ,
+                color = Color.White,
                 modifier = Modifier.padding(16.dp)
             )
         }
