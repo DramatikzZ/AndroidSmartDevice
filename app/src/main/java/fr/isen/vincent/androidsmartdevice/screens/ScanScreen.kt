@@ -1,7 +1,9 @@
 package fr.isen.vincent.androidsmartdevice.screens
 
 import android.bluetooth.BluetoothAdapter
+import android.content.Intent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +33,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fr.isen.vincent.androidsmartdevice.activities.DeviceActivity
+import fr.isen.vincent.androidsmartdevice.activities.ScanActivity
 import fr.isen.vincent.androidsmartdevice.components.TopBar
 import fr.isen.vincent.androidsmartdevice.models.DeviceModel
 import fr.isen.vincent.androidsmartdevice.utils.AppUtil
@@ -44,9 +48,10 @@ fun ScanScreen(
 ) {
     val context = LocalContext.current
 
-    Column(modifier = modifier.fillMaxSize()) {
-        TopBar(modifier)
-
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -59,10 +64,8 @@ fun ScanScreen(
                 onClick = {
                     val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
                     when {
-                        bluetoothAdapter == null ->
-                            AppUtil.showToast(context, "Bluetooth non disponible")
-                        !bluetoothAdapter.isEnabled ->
-                            AppUtil.showToast(context, "Bluetooth non activé")
+                        bluetoothAdapter == null -> AppUtil.showToast(context, "Bluetooth non disponible")
+                        !bluetoothAdapter.isEnabled -> AppUtil.showToast(context, "Bluetooth non activé")
                         else -> onScanToggle()
                     }
                 }
@@ -100,13 +103,26 @@ fun ScanScreen(
 
 @Composable
 fun DeviceItem(device: DeviceModel) {
+
+    val context = LocalContext.current
+
     Row(
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clickable {
+                val intent = Intent(context, DeviceActivity::class.java).apply {
+                    putExtra("device_name", device.name)
+                    putExtra("device_mac_address", device.macaddress)
+                    putExtra("device_signal", device.signal)
+                }
+                context.startActivity(intent)
+            }
     ) {
         Box(
             modifier = Modifier
                 .padding(4.dp)
                 .background(MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.dp))
+
         ) {
             Text(
                 text = "${device.signal}",

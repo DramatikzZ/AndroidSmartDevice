@@ -26,16 +26,14 @@ import fr.isen.vincent.androidsmartdevice.activities.ScanActivity
 import fr.isen.vincent.androidsmartdevice.components.TopBar
 
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(modifier: Modifier) {
 
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
     ) {
-
-        TopBar(modifier)
 
         Column(
             modifier = Modifier

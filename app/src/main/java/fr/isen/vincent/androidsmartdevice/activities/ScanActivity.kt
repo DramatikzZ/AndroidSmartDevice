@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import fr.isen.vincent.androidsmartdevice.components.TopBar
 import fr.isen.vincent.androidsmartdevice.models.DeviceModel
 import fr.isen.vincent.androidsmartdevice.utils.AppUtil
 import kotlinx.coroutines.Job
@@ -96,27 +97,36 @@ class ScanActivity : ComponentActivity() {
     private fun checkAndRequestBluetoothPermissions() {
         val permissions = mutableListOf<String>()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.BLUETOOTH_SCAN)
-            }
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.BLUETOOTH_CONNECT)
-            }
+        // Permissions de base (location est nécessaire pour Bluetooth)
+        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
+
+        // Vérification des permissions spécifiques selon la version d'Android
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12+
+            permissions.addAll(
+                listOf(
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_ADMIN
+                )
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { // Android 10 & 11
+            permissions.addAll(
+                listOf(
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                    Manifest.permission.BLUETOOTH_ADMIN
+                )
+            )
+        } else { // Android < 10
+            permissions.add(Manifest.permission.BLUETOOTH_ADMIN)
         }
 
-        // TOUJOURS ajouter la localisation
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-
-        if (permissions.isNotEmpty()) {
+        // Vérification et demande des permissions
+        if (permissions.any { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }) {
             permissionLauncher.launch(permissions.toTypedArray())
         } else {
             Log.d("BLE_PERMS", "Toutes les permissions déjà accordées")
         }
     }
-
 
 
     @SuppressLint("MissingPermission")
@@ -162,7 +172,8 @@ class ScanActivity : ComponentActivity() {
         setContent {
             AndroidSmartDeviceTheme {
                 Scaffold(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    topBar = { TopBar() }
                 ) { innerPadding ->
                     ScanScreen(
                         modifier = Modifier.padding(innerPadding),
