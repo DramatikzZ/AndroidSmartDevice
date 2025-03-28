@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -44,7 +46,8 @@ fun DeviceScreen(
     onSubscribeToggleButton1: (Boolean) -> Unit,
     onSubscribeToggleButton3: (Boolean) -> Unit,
     counterButton1: Int,
-    counterButton3: Int
+    counterButton3: Int,
+    onResetCounters: () -> Unit
 ) {
 
     var isActivated by remember { mutableIntStateOf(0) }
@@ -249,6 +252,18 @@ fun DeviceScreen(
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                Button(
+                    onClick = { onResetCounters() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Réinitialiser les compteurs",
+                        color = MaterialTheme.colorScheme.onSecondary
+                    )
                 }
             }
         }

@@ -52,7 +52,8 @@ class DeviceActivity : ComponentActivity() {
                         onSubscribeToggleButton1 = { enable -> viewModel.toggleNotificationsFor(viewModel.notifCharButton1, enable) },
                         onSubscribeToggleButton3 = { enable -> viewModel.toggleNotificationsFor(viewModel.notifCharButton3, enable) },
                         counterButton1 = viewModel.counterButton1.intValue,
-                        counterButton3 = viewModel.counterButton3.intValue
+                        counterButton3 = viewModel.counterButton3.intValue,
+                        onResetCounters = { viewModel.resetCounters() }
                     )
                 }
             }

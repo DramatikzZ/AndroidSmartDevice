@@ -131,4 +131,11 @@ class DeviceViewModel : ViewModel() {
         bluetoothGatt?.close()
         bluetoothGatt = null
     }
+
+    @SuppressLint("MissingPermission")
+    fun resetCounters() {
+        counterButton1.value = 0
+        counterButton3.value = 0
+        Log.d("BLE", "Counters have been reset")
+    }
 }
